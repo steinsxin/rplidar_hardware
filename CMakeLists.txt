@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(rplidar_hardware)
 
-# 设置C++标准
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -38,4 +37,20 @@ else()
   )
 endif()
 
-add_executable(${PROJECT_NAME}  src/main.cpp ${RPLIDAR_SDK_SRC})
+# pybind11
+include(FetchContent)
+FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11
+        GIT_TAG        v2.13.5
+)
+
+FetchContent_MakeAvailable(pybind11)
+add_subdirectory(${pybind11_SOURCE_DIR})
+
+add_executable(${PROJECT_NAME} src/demo.cpp src/rplidar.cpp ${RPLIDAR_SDK_SRC})
+
+pybind11_add_module(RPLidar
+    src/rplidar_bind.cpp
+    src/rplidar.cpp ${RPLIDAR_SDK_SRC}
+)
